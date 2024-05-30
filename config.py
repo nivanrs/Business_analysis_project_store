@@ -39,7 +39,7 @@ dimension_columns = {
     
     "dim_product": ["product_id", "product_category_id", "product_name", "product_created", "product_price", "product_discount"],
     "dim_product_category": ["product_category_id", "product_category_name"],
-    "fact_orders_items" : ['order_item_id', 'order_id',	'product_id', 'order_item_quantity', 'product_discount', 'product_subdiscount',	'product_price', 'product_subprice']
+    "fact_orders_items" : ['order_item_id', 'product_id', 'order_id', 'order_item_quantity', 'product_discount', 'product_subdiscount',	'product_price', 'product_subprice']
 }
 
 ddl_statements = {
@@ -162,8 +162,8 @@ ddl_marts = {
                dv.voucher_name, fo.order_total
         FROM fact_orders fo
         INNER JOIN dim_user du ON fo.user_id = du.user_id
-        INNER JOIN dim_payments dp ON fo.payment_id = dp.payment_id
-        INNER JOIN dim_shippers ds ON fo.shipper_id = ds.shipper_id
-        INNER JOIN dim_vouchers dv ON fo.voucher_id = dv.voucher_id;
+        INNER JOIN dim_payment dp ON fo.payment_id = dp.payment_id
+        INNER JOIN dim_shipper ds ON fo.shipper_id = ds.shipper_id
+        INNER JOIN dim_voucher dv ON fo.voucher_id = dv.voucher_id;
     """
 }
