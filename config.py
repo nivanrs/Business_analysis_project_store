@@ -12,8 +12,8 @@ oltp_tables = {
     "orders": "tb_orders",
 
     "product_category": "tb_product_category",
-    "products": "tb_product",   
-    "orders_items": "tb_orders_items"
+    "products": "tb_products",   
+    "orders_items": "tb_order_items"
 }
 
 warehouse_tables = {
@@ -123,18 +123,16 @@ ddl_statements = {
     """,    
     "fact_orders_items": """
         CREATE TABLE IF NOT EXISTS fact_orders_items (
-            order_item_id int4 NOT NULL,
-            order_id int4 NOT NULL,
-            product_id int4 NOT NULL,
-            order_item_quantity int4 NULL,
-            product_discount int4 NULL,
-            product_subdiscount int4 NULL,
-            product_price int4 NOT NULL,
-            product_subprice int4 NOT NULL,
+            order_item_id INT NOT NULL PRIMARY KEY,
+            product_id INT NOT NULL,
+            order_id INT NOT NULL,
+            order_item_quantity INT NOT NULL,
+            product_discount INT NOT NULL,
+            product_subdiscount INT NOT NULL,
+            product_price INT NOT NULL,
+            product_subprice INT NOT NULL,
             FOREIGN KEY (order_id) REFERENCES fact_orders(order_id),
-            FOREIGN KEY (product_id) REFERENCES dim_product(product_id),
-            FOREIGN KEY (product_discount) REFERENCES dim_product(product_discount),            
-            FOREIGN KEY (product_price) REFERENCES dim_product(product_price)
+            FOREIGN KEY (product_id) REFERENCES dim_product(product_id)
         );
     """
 }
@@ -163,7 +161,7 @@ ddl_marts = {
                dp.payment_name, ds.shipper_name, fo.order_price, fo.order_discount, 
                dv.voucher_name, fo.order_total
         FROM fact_orders fo
-        INNER JOIN dim_users du ON fo.user_id = du.user_id
+        INNER JOIN dim_user du ON fo.user_id = du.user_id
         INNER JOIN dim_payments dp ON fo.payment_id = dp.payment_id
         INNER JOIN dim_shippers ds ON fo.shipper_id = ds.shipper_id
         INNER JOIN dim_vouchers dv ON fo.voucher_id = dv.voucher_id;
