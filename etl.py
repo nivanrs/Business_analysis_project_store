@@ -43,6 +43,19 @@ def transform_fact_orders():
     fact_orders_columns = dimension_columns.get('fact_orders')
     return df_orders[fact_orders_columns]
 
+def transform_fact_orders_items():
+    """Transform data for the fact_orders_items table."""
+    dataframes = {table: extract_data(table) for table in oltp_tables.keys()}
+
+    df_orders_items = dataframes['orders_items']
+    df_orders_items = df_orders_items.merge(dataframes['orders'], on='order_id')
+    df_orders_items = df_orders_items.merge(dataframes['products'], on='product_id')
+    df_orders_items = df_orders_items.merge(dataframes['products'], on='product_discount')
+    df_orders_items = df_orders_items.merge(dataframes['products'], on='product_price')    
+    df_orders_items.rename(columns={'order_id_x': 'order_id'}, inplace=True)
+    
+    fact_orders_items_columns = dimension_columns.get('fact_orders_items')
+    return df_orders_items[fact_orders_items_columns]
 
 def load_data(df, table_name):
     """Load the transformed data into the target table in the data warehouse."""
@@ -79,6 +92,12 @@ def get_unique_key(table_name):
         return 'voucher_id'
     elif table_name == 'fact_orders':
         return 'order_id'
+    elif table_name == 'dim_product_category':
+        return 'product_category_id'
+    elif table_name == 'dim_product':
+        return 'product_id'
+    elif table_name == 'fact_orders_items':
+        return 'order_item_id'
     # Tambahkan kondisi lain jika ada tabel lain
     else:
         raise ValueError("Table name not recognized.")
@@ -110,6 +129,8 @@ def etl_process():
             # Process fact table
             df_fact_orders = transform_fact_orders()
             load_data(df_fact_orders, target_table)
+            df_fact_orders_items = transform_fact_orders_items()
+            load_data(df_fact_orders_items, target_table)
 
     # proses mart table
     create_and_insert_dm_sales()
