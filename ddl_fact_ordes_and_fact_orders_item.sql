@@ -59,16 +59,14 @@ CREATE TABLE IF NOT EXISTS dim_product (
     FOREIGN KEY (product_category_id) REFERENCES dim_product_category(product_category_id)
 );
 CREATE TABLE IF NOT EXISTS fact_orders_items (
-    order_item_id int4 NOT NULL,
-    order_id int4 NOT NULL,
-    product_id int4 NOT NULL,
-    order_item_quantity int4 NULL,
-    product_discount int4 NULL,
-    product_subdiscount int4 NULL,
-    product_price int4 NOT NULL,
-    product_subprice int4 NOT NULL,
+    order_item_id INT NOT NULL PRIMARY KEY,
+    product_id INT NOT NULL,
+    order_id INT NOT NULL,
+    order_item_quantity INT NOT NULL,
+    product_discount INT NOT NULL,
+    product_subdiscount INT NOT NULL,
+    product_price INT NOT NULL,
+    product_subprice INT NOT NULL,
     FOREIGN KEY (order_id) REFERENCES fact_orders(order_id),
-    FOREIGN KEY (product_id) REFERENCES dim_product(product_id),
-    FOREIGN KEY (product_discount) REFERENCES dim_product(product_discount),
-    FOREIGN KEY (product_price) REFERENCES dim_product(product_price)
+    FOREIGN KEY (product_id) REFERENCES dim_product(product_id)
 );
