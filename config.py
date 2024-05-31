@@ -165,7 +165,7 @@ ddl_marts = {
         INNER JOIN dim_user du ON fo.user_id = du.user_id
         INNER JOIN dim_payment dp ON fo.payment_id = dp.payment_id
         INNER JOIN dim_shipper ds ON fo.shipper_id = ds.shipper_id
-        INNER JOIN dim_voucher dv ON fo.voucher_id = dv.voucher_id;
+        LEFT JOIN dim_voucher dv ON fo.voucher_id = dv.voucher_id;
     """,
     "dm_order_product": """
         CREATE TABLE IF NOT EXISTS dm_order_product (
