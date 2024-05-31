@@ -138,7 +138,7 @@ ddl_statements = {
 }
 
 ddl_marts = {
-    "dim_sales": """
+    "dm_sales": """
         CREATE TABLE IF NOT EXISTS dm_sales (
             order_id INT NOT NULL PRIMARY KEY,
             order_date DATE NOT NULL,
@@ -150,20 +150,52 @@ ddl_marts = {
             order_discount INT,
             voucher_name VARCHAR(255),
             order_total INT NOT NULL,
+            user_address VARCHAR(255),
             FOREIGN KEY (order_id) REFERENCES fact_orders(order_id),
             FOREIGN KEY (user_id) REFERENCES dim_user(user_id)
         );
     """,
     "insert_dm_sales": """
         INSERT INTO dm_sales (order_id, order_date, user_id, user_name, payment_type, shipper_name, 
-                              order_price, order_discount, voucher_name, order_total)
+                              order_price, order_discount, voucher_name, order_total, user_address)
         SELECT fo.order_id, fo.order_date, fo.user_id, du.user_first_name || ' ' || du.user_last_name, 
                dp.payment_name, ds.shipper_name, fo.order_price, fo.order_discount, 
-               dv.voucher_name, fo.order_total
+               dv.voucher_name, fo.order_total, du.user_address
         FROM fact_orders fo
         INNER JOIN dim_user du ON fo.user_id = du.user_id
         INNER JOIN dim_payment dp ON fo.payment_id = dp.payment_id
         INNER JOIN dim_shipper ds ON fo.shipper_id = ds.shipper_id
         INNER JOIN dim_voucher dv ON fo.voucher_id = dv.voucher_id;
+    """,
+    "dm_order_product": """
+        CREATE TABLE IF NOT EXISTS dm_order_product (
+            order_item_id INT NOT NULL PRIMARY KEY,
+            order_id INT NOT NULL,
+            order_item_quantity INT NOT NULL,
+            product_id INT NOT NULL,
+            product_name VARCHAR(255),
+            product_category_id INT NOT NULL,
+            product_category_name VARCHAR(255),
+            FOREIGN KEY (order_id) REFERENCES fact_orders(order_id),
+            FOREIGN KEY (product_id) REFERENCES dim_product(product_id)
+            );
+    """,
+    "insert_dm_order_product": """
+        INSERT INTO dm_order_product (order_item_id, order_id, order_item_quantity,product_id,product_name,product_category_id,product_category_name)
+        SELECT 
+            foi.order_item_id,
+            foi.order_id,
+            foi.order_item_quantity,
+            foi.product_id, 
+            di.product_name, 
+            di.product_category_id, 
+            dc.product_category_name
+        FROM fact_orders_items foi
+        INNER JOIN 
+            fact_orders fo ON fo.order_id = foi.order_id
+        INNER JOIN 
+            dim_product di ON foi.product_id = di.product_id
+        INNER JOIN 
+            dim_product_category dc ON di.product_category_id = dc.product_category_id;
     """
 }
